@@ -1,11 +1,8 @@
 const express = require('express');
 
-
+const { PORT } = require('./config/config')
 // const connectToDb = require("./db/mongodb")
 
-// Configs
-require('dotenv').config();
-const PORT = process.env.PORT || 8000;
 
 // Routers
 const userRouter = require("./routes/user.routes")
@@ -21,18 +18,19 @@ const app = express();
 
 
 // Middlewares
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
 
 
 // Route(s) and Routers
 // app.use("/api/v1/users", userRouter);
-// app.use("/api/v1/blogs", blogRouter);
+app.use("/api/v1/blogs", blogRouter);
 
 app.get("/", (req, res) => {
     res.send("Welcome to the Blogging API");
 })
 
-//Error handler middleware
+// Error handler middleware
 app.use((err, req, res, next) => {
     console.log(err);
     const errorStatus = err.status || 500;

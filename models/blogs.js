@@ -10,13 +10,13 @@ const BlogSchema = new Schema({
         type: String,
         required: [true, "This is required"],
         unique: true,
-        minLength: 50,
+        minLength: 20,
         maxLength: 59,
         trim: true
     },
     description: {
         type: String,
-        minLength: 150,
+        // minLength: 150,
         maxLength: 200,
         trim: true
     },
@@ -29,7 +29,8 @@ const BlogSchema = new Schema({
         enum: ["draft", "published"]
     },
     read_count: {
-        type: Number
+        type: Number,
+        default: 0
     },
     reading_time: {
         type: Number

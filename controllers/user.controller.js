@@ -4,12 +4,7 @@ const { generateJwtToken } = require('../utils/utils');
 function signUp(req, res, next) {
     const userInfo = req.body;
 
-    userModel.create({
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        email: userInfo.email,
-        password: userInfo.password
-    })
+    userModel.create(userInfo)
     .then((user) => {
         user.password = undefined;
         res.status(201).send({

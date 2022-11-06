@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { MONGO_DB_CONNECTION_URL } = require('../config/config');
+const { MONGO_DB_CONNECTION_URL } = require('../configs/config');
 
 // Make connection to the database
 function connectToMongoDb() {

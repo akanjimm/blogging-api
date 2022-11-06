@@ -1,6 +1,7 @@
 const express = require('express');
+const passport = require('passport');
 
-const { PORT } = require('./config/config')
+const { PORT } = require('./configs/config')
 const { connectToMongoDb } = require("./db/mongodb")
 
 
@@ -20,6 +21,9 @@ connectToMongoDb();
 // Middlewares
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
+
+app.use(passport.initialize());
+require('./configs/passport');
 
 
 // Route(s) and Routers

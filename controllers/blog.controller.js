@@ -2,7 +2,16 @@ const blogModel = require('../models/blogs');
 const { calcReadingTime } = require('../utils/utils')
 
 function getAllBlogs(req, res, next) {
-    console.log("all blogs");
+    blogModel.find( { state: "published"} )
+        .then((blogs) => {
+            res.status(200).send({
+                message: "All published blogs",
+                data: { blogs }
+            });
+        })
+        .catch((err) => {
+            next(err);
+        })
 }
 
 function getBlogByID(req, res, next) {

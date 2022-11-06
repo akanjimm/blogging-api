@@ -6,21 +6,21 @@ const bcrypt = require("bcrypt");
 // Define a schema
 const Schema = mongoose.Schema;
 
-// Define blog schema
+// Define User Schema
 const UserSchema = new Schema({
     firstName: {
         type: String,
-        required: true,
+        required: [true, "This is required"],
         trim: true
     },
     lastName: {
         type: String,
-        required: true,
+        required: [true, "This is required"],
         trim: true
     },
     email: {
         type: String,
-        required: true,
+        required: [true, "This is required"],
         unique: true,
         lowercase: true,
         match: [/\S+@\S+\.\S+/, 'Invalid email'],
@@ -28,7 +28,7 @@ const UserSchema = new Schema({
     },
     password: {
         type: String,
-        required: [true, "password is required"],
+        required: [true, "This is required"],
         minLength: 6,
         trim: true,
     }
@@ -48,11 +48,6 @@ UserSchema.pre("save", async function (next) {
 UserSchema.methods.isPasswordVerified = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
-
-// UserSchema.methods.isPasswordCorrect = async function (inputPassword) {
-//     const isCorrect = await bcrypt.compare(inputPassword, this.password);
-//     return isCorrect;
-//   };
 
 const UserModel = mongoose.model('users', UserSchema);
 

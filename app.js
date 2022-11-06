@@ -1,7 +1,7 @@
 const express = require('express');
 
 const { PORT } = require('./config/config')
-// const connectToDb = require("./db/mongodb")
+const { connectToMongoDb } = require("./db/mongodb")
 
 
 // Routers
@@ -14,7 +14,7 @@ const app = express();
 
 
 // MongoDb Database Connection
-// connectToMongoDB();
+connectToMongoDb();
 
 
 // Middlewares
@@ -23,7 +23,7 @@ app.use(express.json());
 
 
 // Route(s) and Routers
-// app.use("/api/v1/users", userRouter);
+app.use("/api/v1/users", userRouter);
 app.use("/api/v1/blogs", blogRouter);
 
 app.get("/", (req, res) => {
@@ -32,9 +32,13 @@ app.get("/", (req, res) => {
 
 // Error handler middleware
 app.use((err, req, res, next) => {
-    console.log(err);
+    console.log(err.status, err);
     const errorStatus = err.status || 500;
-    res.status(errorStatus).send(err.message);
+    const errorMessage = err.message || "Internal server error.";
+    res.status(errorStatus).send({
+        message: errorMessage,
+        data: null
+    });
     next();
 });
 

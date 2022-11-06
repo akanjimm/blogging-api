@@ -4,14 +4,16 @@ const { generateJwtToken } = require('../utils/utils');
 function signUp(req, res, next) {
     const userInfo = req.body;
 
+    if (!userInfo.firstName || !userInfo.lastName || !userInfo.email || !userInfo.password) {
+        return next(new Error("All fields are required"))
+    }
+
     userModel.create(userInfo)
     .then((user) => {
         user.password = undefined;
         res.status(201).send({
             message: "User successfully created",
-            data: {
-                user
-            },
+            data: { user },
             token: generateJwtToken(user)
         });
     })
@@ -44,9 +46,7 @@ function signIn(req, res, next) {
             user.password = undefined;
             res.status(200).send({
                 message: "User successfully signed in",
-                data: {
-                    user
-                },
+                data: { user },
                 token: generateJwtToken(user)
             });
         })

@@ -1,4 +1,5 @@
 const blogModel = require('../models/blogs');
+const userModel = require('../models/users');
 const { calcReadingTime } = require('../utils/utils')
 
 function getAllBlogs(req, res, next) {
@@ -15,7 +16,42 @@ function getAllBlogs(req, res, next) {
 }
 
 function getBlogByID(req, res, next) {
-    console.log("blog by id");
+    const blogId = req.params.id;
+    let author;
+
+    blogModel.findOne({ _id: blogId, state: "published" })
+        .then(async (blog) => {
+            if (!blog) {
+                res.status(404).send({
+                    message: "Blog not found or blog is not published",
+                    data: { blog }
+                })
+            };
+
+            // Update blog's read_count
+            try {
+                let updatedCountBlog = await blogModel.findByIdAndUpdate(blogId, { read_count: blog.read_count + 1 }, { new: true });
+                console.log(updatedCountBlog);
+            } catch (error) {
+                next(err);
+            }
+
+            // Get blog's author object
+            try {
+                author = await userModel.findOne({ _id: blog.author});
+                author.password = undefined;
+            } catch (error) {
+                next(err);
+            }
+
+            res.status(200).send({
+                message: "Blog found",
+                data: { blog, author }
+            })
+        })
+        .catch((err) => {
+            next(err);
+        })
 }
 
 function getMyBlogs(req, res, next) {
@@ -32,12 +68,10 @@ function getMyBlogs(req, res, next) {
                     data: { blogs: filteredBlogs }
                 });
             };
-
             res.status(200).send({
                 message: "All my blogs",
                 data: { blogs }
             });
-            
         })
         .catch((err) => {
             next(err);

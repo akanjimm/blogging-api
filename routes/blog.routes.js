@@ -6,9 +6,9 @@ const blogRouter = express.Router();
 
 blogRouter.get('/', blogController.getAllBlogs);
 
-blogRouter.get('/:id', blogController.getBlogByID);
+blogRouter.get('/blog/:id', blogController.getBlogByID);
 
-blogRouter.get('/myblogs/:userid', passport.authenticate("jwt", { session: false }), blogController.getBlogsByUserID);
+blogRouter.get('/myblogs/', passport.authenticate("jwt", { session: false }), blogController.getMyBlogs);
 
 blogRouter.post('/', passport.authenticate("jwt", { session: false }), blogController.addBlog);
 

@@ -18,8 +18,30 @@ function getBlogByID(req, res, next) {
     console.log("blog by id");
 }
 
-function getBlogsByUserID(req, res, next) {
-    console.log("all blogs by userid");
+function getMyBlogs(req, res, next) {
+    const loggedInUser = req.user;
+    const state = req.query.state;
+    console.log(state);
+
+    blogModel.find( { author: loggedInUser._id } )
+        .then((blogs) => {
+            if (state) {
+                let filteredBlogs = blogs.filter((blog) => blog.state === state);
+                return res.status(200).send({
+                    message: `All my blogs - ${state}`,
+                    data: { blogs: filteredBlogs }
+                });
+            };
+
+            res.status(200).send({
+                message: "All my blogs",
+                data: { blogs }
+            });
+            
+        })
+        .catch((err) => {
+            next(err);
+        })
 }
 
 function addBlog(req, res, next) {
@@ -107,7 +129,7 @@ function deleteBlogByID(req, res, next) {
 module.exports = {
     getAllBlogs,
     getBlogByID,
-    getBlogsByUserID,
+    getMyBlogs,
     addBlog,
     updateBlogByID,
     deleteBlogByID

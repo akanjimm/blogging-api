@@ -69,7 +69,30 @@ function updateBlogByID(req, res, next) {
 }
 
 function deleteBlogByID(req, res, next) {
-    console.log("blog deleted");
+    const blogId = req.params.id;
+    const loggedInUser = req.user;
+
+    blogModel.findOne({ _id: blogId })
+        .then(async (blog) => {
+            // check if blog owner is the current loggedin user
+            if (loggedInUser._id !== blog.author.toString()) {
+                return next(new Error("Sorry, you are not the blog owner. You can't update blog."))
+            }
+
+            // delete blog
+            try {
+                const updatedBlog = await blogModel.findByIdAndDelete(blogId);
+                res.status(200).send({
+                    message: "Blog post successfully deleted",
+                    data: {}
+                });
+            } catch (err) {
+                next(err);
+            }
+        })
+        .catch((err) => {
+            next(err);
+        })
 }
 
 module.exports = {

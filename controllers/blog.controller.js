@@ -14,7 +14,7 @@ function getAllBlogs(req, res, next) {
     const sortBy = req.query.sortBy;
     const sortOrder = sortOrderObject[req.query.sortOrder] || 1;
     let page = parseInt(req.query.page) || 1;
-    const pageLimit = 20;
+    let pageLimit = parseInt(req.query.pageLimit) || 20;
 
     const searchQuery = { state: "published" };
     const sortQuery = {};
@@ -22,6 +22,10 @@ function getAllBlogs(req, res, next) {
     // set page to 1 if page query parameter is less than one
     if (page < 1) {
         page = 1;
+    }
+
+    if (pageLimit < 1) {
+        pageLimit = 20;
     }
     let documentsToSkip = (page - 1) * pageLimit;
 
@@ -89,13 +93,18 @@ function getMyBlogs(req, res, next) {
     const loggedInUser = req.user;
     const state = req.query.state;
     let page = parseInt(req.query.page) || 1;
-    const pageLimit = 1;
+    let pageLimit = parseInt(req.query.pageLimit) || 20;
     const filterQuery = {};
 
     // set page to 1 if page query parameter is less than one
     if (page < 1) {
         page = 1;
     }
+
+    if (pageLimit < 1) {
+        pageLimit = 20;
+    }
+    
     let documentsToSkip = (page - 1) * pageLimit;
 
     // Check if state query parameter is passed a value and assign value to the filter object

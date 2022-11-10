@@ -3,7 +3,38 @@ const userModel = require('../models/users');
 const { calcReadingTime } = require('../utils/utils')
 
 function getAllBlogs(req, res, next) {
-    blogModel.find( { state: "published"} )
+    const sortOrderObject = {
+        asc: 1,
+        desc: -1
+    }
+
+    const author = req.query.author;
+    const title = req.query.title;
+    const tags = req.query.tags;
+    const sortBy = req.query.sortBy;
+    const sortOrder = sortOrderObject[req.query.sortOrder] || 1;
+    let page = parseInt(req.query.page) || 1;
+    const pageLimit = 20;
+    
+    const searchQuery = { state: "published" };
+    const sortQuery = {};
+
+    // set page to 1 if page query parameter is less than one
+    if (page < 1) {
+        page = 1;
+    }
+    let documentsToSkip = (page - 1) * pageLimit;
+
+    // Check if query parameters are passed a value and assign search and sort objects values respectively
+    if (author) searchQuery.author = author;
+    if (title) searchQuery.title = new RegExp(title, "i");
+    if (tags) searchQuery.tags = {$all: tags.split(" ")};
+    if (["read_count", "reading_time", "timestamp"].includes(sortBy)) sortQuery[sortBy] = sortOrder;
+
+    blogModel.find( { ...searchQuery } )
+        .sort( { ...sortQuery } )
+        .skip(documentsToSkip)
+        .limit(pageLimit)
         .then((blogs) => {
             res.status(200).send({
                 message: "All published blogs",
@@ -103,6 +134,13 @@ function updateBlogByID(req, res, next) {
     if (blogUpdate.author || blogUpdate.read_count || blogUpdate.reading_time) {
         return next(new Error("Sorry, you can't update author, read count and reading time"));
     }
+
+    // update blog reading time if blog body is updated
+    if (blogUpdate.body) {
+        blogUpdate.reading_time = calcReadingTime(blogUpdate.body);
+    }
+
+    console.log(blogUpdate);
 
     blogModel.findOne({ _id: blogId })
         .then(async (blog) => {

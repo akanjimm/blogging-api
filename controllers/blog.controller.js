@@ -15,7 +15,7 @@ function getAllBlogs(req, res, next) {
     const sortOrder = sortOrderObject[req.query.sortOrder] || 1;
     let page = parseInt(req.query.page) || 1;
     const pageLimit = 20;
-    
+
     const searchQuery = { state: "published" };
     const sortQuery = {};
 
@@ -28,11 +28,11 @@ function getAllBlogs(req, res, next) {
     // Check if query parameters are passed a value and assign search and sort objects values respectively
     if (author) searchQuery.author = author;
     if (title) searchQuery.title = new RegExp(title, "i");
-    if (tags) searchQuery.tags = {$all: tags.split(" ")};
+    if (tags) searchQuery.tags = { $all: tags.split(" ") };
     if (["read_count", "reading_time", "timestamp"].includes(sortBy)) sortQuery[sortBy] = sortOrder;
 
-    blogModel.find( { ...searchQuery } )
-        .sort( { ...sortQuery } )
+    blogModel.find({ ...searchQuery })
+        .sort({ ...sortQuery })
         .skip(documentsToSkip)
         .limit(pageLimit)
         .then((blogs) => {
@@ -69,7 +69,7 @@ function getBlogByID(req, res, next) {
 
             // Get blog's author object
             try {
-                author = await userModel.findOne({ _id: blog.author});
+                author = await userModel.findOne({ _id: blog.author });
                 author.password = undefined;
             } catch (error) {
                 next(err);
@@ -88,14 +88,25 @@ function getBlogByID(req, res, next) {
 function getMyBlogs(req, res, next) {
     const loggedInUser = req.user;
     const state = req.query.state;
+    let page = parseInt(req.query.page) || 1;
+    const pageLimit = 1;
     const filterQuery = {};
 
+    // set page to 1 if page query parameter is less than one
+    if (page < 1) {
+        page = 1;
+    }
+    let documentsToSkip = (page - 1) * pageLimit;
+
+    // Check if state query parameter is passed a value and assign value to the filter object
     if (state) filterQuery.state = state;
 
-    blogModel.find( { author: loggedInUser._id, ...filterQuery } )
+    blogModel.find({ author: loggedInUser._id, ...filterQuery })
+        .skip(documentsToSkip)
+        .limit(pageLimit)
         .then((blogs) => {
             res.status(200).send({
-                message: "All my blogs",
+                message: "My blogs",
                 data: { blogs }
             });
         })

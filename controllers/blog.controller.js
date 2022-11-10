@@ -57,17 +57,12 @@ function getBlogByID(req, res, next) {
 function getMyBlogs(req, res, next) {
     const loggedInUser = req.user;
     const state = req.query.state;
-    console.log(state);
+    const filterQuery = {};
 
-    blogModel.find( { author: loggedInUser._id } )
+    if (state) filterQuery.state = state;
+
+    blogModel.find( { author: loggedInUser._id, ...filterQuery } )
         .then((blogs) => {
-            if (state) {
-                let filteredBlogs = blogs.filter((blog) => blog.state === state);
-                return res.status(200).send({
-                    message: `All my blogs - ${state}`,
-                    data: { blogs: filteredBlogs }
-                });
-            };
             res.status(200).send({
                 message: "All my blogs",
                 data: { blogs }

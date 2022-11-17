@@ -90,9 +90,9 @@ Success
 }
 ```
 ---
-### Login User
+### Signin User
 
-- Route: /login
+- Route: /api/v1/users/signin
 - Method: POST
 - Body: 
 ```
@@ -170,19 +170,19 @@ Success
 ### Update Blog
 
 - Route: /api/v1/blogs/:id
-- Method: UPDATE
+- Method: PUT
 - Header
     - Authorization: Bearer {token}
     
 Note: 
   * the author, read_count, and reading_time fields cannot be manually updated.
-  * id is the ObjectId("...")
+  * :id is the value of the _id property of the blog
 
 - Body
 ```
 {
-    state: "published",
-    title: "The first blog post - edited",
+    "state": "published",
+    "title": "The first blog post - edited",
     "body": "This is the body of the first blog post. This is the body of the first blog post. This is the body of the first blog post. This is the body of the first blog post."
 }
 ```
@@ -223,7 +223,8 @@ Success
     - Authorization: Bearer {token}
 - Responses
 
-Note id is the ObjectId("...")
+Note:
+  * :id is the value of the _id property of the blog
 
 Success
 ```
@@ -283,7 +284,8 @@ Success
 - Method: GET
 - Responses
 
-- Note id is the ObjectId("...")
+Note:
+  * :id is the value of the _id property of the blog
 
 Success
 ```
